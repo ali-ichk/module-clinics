@@ -2,7 +2,7 @@ CHANGELOG
 =========
 v1.11.01
 -------
-Replaced $gibbon->session to $session as "$gibbon->session" is deprecated
+Replaced deprecated $gibbon->session calls with $session
 
 v1.11.00
 -------

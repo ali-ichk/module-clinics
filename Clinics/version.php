@@ -23,4 +23,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Sets version information
  */
 $moduleVersion = '1.11.01';
-$coreVersion = '28.0.00';
+$coreVersion = '29.0.00';
