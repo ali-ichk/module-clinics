@@ -71,7 +71,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol.php') == fal
 
         $table->addColumn('clinicName')
             ->setClass('text-lg font-bold mb-1')
-            ->format(function ($block) use ($gibbon) {
+            ->format(function ($block) use ($session) {
                 if ($block['clinicName'] != '') {
                     return $block['clinicName'];
                 }

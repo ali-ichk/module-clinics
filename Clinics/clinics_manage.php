@@ -103,7 +103,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage.php
         ->addParam('gibbonSchoolYearID', $gibbonSchoolYearID)
         ->addParam('clinicsClinicID')
         ->addParam('clinicsBlockID', $clinicsBlockID)
-        ->format(function ($clinic, $actions) use ($gibbon) {
+        ->format(function ($clinic, $actions) {
             $actions->addAction('edit', __('Edit'))
                     ->setURL('/modules/Clinics/clinics_manage_edit.php');
 

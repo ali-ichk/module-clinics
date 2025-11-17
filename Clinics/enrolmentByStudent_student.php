@@ -93,7 +93,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
 
         $table->addColumn('clinicName')
             ->setClass('text-lg font-bold mb-1')
-            ->format(function ($block) use ($gibbon, $gibbonPersonID, $search) {
+            ->format(function ($block) use ($gibbonPersonID, $search, $session) {
                 if ($block['clinicName'] != '') {
                     return $block['clinicName']."<br/><a class='thickbox' href='".$session->get('absoluteURL')."/fullscreen.php?q=/modules/Clinics/enrolmentByStudent_student_delete.php&clinicsClinicStudentID=".$block['clinicsClinicStudentID']."&clinicsClinicID=".$block['clinicsClinicID']."&gibbonPersonID=".$block['gibbonPersonID']."&search=".$search."&width=650&height=135'><img src='./themes/".$session->get('gibbonThemeName')."/img/garbage.png'/></a>";;
                 }
