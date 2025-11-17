@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,15 +21,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use Gibbon\Forms\Form;
 use Gibbon\Forms\DatabaseFormFactory;
-use Gibbon\Module\Clinics\Domain\ClinicsStudentsGateway;
 use Gibbon\Module\Clinics\Domain\ClinicsGateway;
+use Gibbon\Module\Clinics\Domain\ClinicsStudentsGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_enrolment_edit.php') == false) {
     // Access denied
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
     $clinicsBlockID = $_GET['clinicsBlockID'] ?? '';
     $clinicsClinicID = $_GET['clinicsClinicID'] ?? '';
     $clinicsClinicStudentID = $_GET['clinicsClinicStudentID'] ?? '';
@@ -36,16 +38,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_enr
         ->add(__m('Manage Clinics'), 'clinics_manage.php', ['gibbonSchoolYearID' => $gibbonSchoolYearID])
         ->add(__m('Manage Enrolment'), 'clinics_manage_enrolment.php', ['clinicsClinicID' => $clinicsClinicID, 'gibbonSchoolYearID' => $gibbonSchoolYearID])
         ->add(__m('Edit Enrolment'));
-
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
-    if (!empty($clinicsBlockID)) {
-        echo "<div class='linkTop'>";
-        echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Clinics/clinics_manage_enrolment.php&gibbonSchoolYearID='.$gibbonSchoolYearID."&clinicsBlockID=".$clinicsBlockID."&clinicsClinicID=$clinicsClinicID'>".__('Back').'</a>';
-        echo '</div>';
-    }
 
     if (empty($clinicsClinicID) || empty($clinicsClinicStudentID)) {
         $page->addError(__('You have not specified one or more required parameters.'));
@@ -59,18 +51,29 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_enr
         return;
     }
 
-    $form = Form::create('clinicsManage', $gibbon->session->get('absoluteURL').'/modules/Clinics/clinics_manage_enrolment_editProcess.php');
+    $form = Form::create('clinicsManage', $session->get('absoluteURL').'/modules/Clinics/clinics_manage_enrolment_editProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
     $form->addHiddenValue('gibbonSchoolYearID', $gibbonSchoolYearID);
     $form->addHiddenValue('clinicsBlockID', $clinicsBlockID);
     $form->addHiddenValue('clinicsClinicID', $clinicsClinicID);
     $form->addHiddenValue('clinicsClinicStudentID', $clinicsClinicStudentID);
 
+    if (!empty($clinicsBlockID)) {
+        $params = [
+            "gibbonSchoolYearID" => $gibbonSchoolYearID,
+            "clinicsBlockID" => $clinicsBlockID,
+            "clinicsClinicID" => $clinicsClinicID
+        ];
+        $form->addHeaderAction('back', __('Back'))
+            ->setURL('/modules/Clinics/clinics_manage_enrolment.php')
+            ->addParams($params);
+    }
+
     $row = $form->addRow();
         $row->addLabel('gibbonPersonID', __('Person'));
-        $row->addSelectStudent('gibbonPersonID', $gibbon->session->get('gibbonSchoolYearID'))->readonly();
+        $row->addSelectStudent('gibbonPersonID', $session->get('gibbonSchoolYearID'))->readonly();
 
     $statuses = array(
         'Enroled' => __m('Enroled'),

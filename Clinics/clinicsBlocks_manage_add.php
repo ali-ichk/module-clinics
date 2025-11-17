@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +28,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinicsBlocks_mana
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
     $schoolYearGateway = $container->get(SchoolYearGateway::class);
     $schoolYear = $schoolYearGateway->getSchoolYearByID($gibbonSchoolYearID);
     $yearName = $schoolYear['name'];
@@ -35,14 +37,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinicsBlocks_mana
         ->add(__m('Manage Blocks'), 'clinicsBlocks_manage.php', ['gibbonSchoolYearID' => $gibbonSchoolYearID])
         ->add(__m('Add Block'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
-    $form = Form::create('block', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/clinicsBlocks_manage_addProcess.php');
+    $form = Form::create('block', $session->get('absoluteURL').'/modules/'.$session->get('module').'/clinicsBlocks_manage_addProcess.php');
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
     $form->addHiddenValue('gibbonSchoolYearID', $gibbonSchoolYearID);
 
     $row = $form->addRow();
@@ -62,11 +60,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinicsBlocks_mana
         $row->addSequenceNumber('sequenceNumber', 'clinicsBlock', $sequenceNumber)->required()->maxLength(3);
 
     $row = $form->addRow();
-        $row->addLabel('firstDay', __('First Day'))->description($gibbon->session->get("i18n")["dateFormat"])->prepend(__('Format:'));
+        $row->addLabel('firstDay', __('First Day'))->description($session->get("i18n")["dateFormat"])->prepend(__('Format:'));
         $row->addDate('firstDay')->required();
 
     $row = $form->addRow();
-        $row->addLabel('lastDay', __('Last Day'))->description($gibbon->session->get("i18n")["dateFormat"])->prepend(__('Format:'));
+        $row->addLabel('lastDay', __('Last Day'))->description($session->get("i18n")["dateFormat"])->prepend(__('Format:'));
         $row->addDate('lastDay')->required();
 
     $row = $form->addRow();

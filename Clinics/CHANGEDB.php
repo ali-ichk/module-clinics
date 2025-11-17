@@ -126,3 +126,45 @@ $count++;
 $sql[$count][0] = "1.8.00";
 $sql[$count][1] = "";
 $count++;
+
+//v1.8.02
+$sql[$count][0] = "1.8.02";
+$sql[$count][1] = "";
+$count++;
+
+//v1.9.00
+$sql[$count][0] = "1.9.00";
+$sql[$count][1] = "";
+$count++;
+
+//v1.9.01
+$sql[$count][0] = "1.9.01";
+$sql[$count][1] = "";
+$count++;
+
+//v1.10.00
+++$count;
+$sql[$count][0] = '1.10.00';
+$sql[$count][1] = "
+UPDATE gibbonModule SET author='Gibbon Foundation', url='https://gibbonedu.org' WHERE name='Clinics';end
+";
+
+//v1.10.01
+++$count;
+$sql[$count][0] = '1.10.01';
+$sql[$count][1] = "";
+
+//v1.10.02
+++$count;
+$sql[$count][0] = '1.10.02';
+$sql[$count][1] = "";
+
+//v1.11.00
+++$count;
+$sql[$count][0] = '1.11.00';
+$sql[$count][1] = "";
+
+//v1.11.01
+++$count;
+$sql[$count][0] = '1.11.01';
+$sql[$count][1] = "";

@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,21 +30,17 @@ if (isModuleAccessible($guid, $connection2) == false) {
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 
     $page->breadcrumbs
         ->add(__m('View Clinics'));
-
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
 
     //Filter
     $clinicsBlockID = $_GET['clinicsBlockID'] ?? '';
 
     $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
     $form->setTitle(__('Filter'));
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
 
     $form->addHiddenValue('q', '/modules/'.$session->get('module').'/clinics.php');
 
@@ -53,7 +51,7 @@ if (isModuleAccessible($guid, $connection2) == false) {
         $row->addSelect('clinicsBlockID')->fromQuery($pdo, $sql, $data)->placeholder()->selected($clinicsBlockID);
 
     $row = $form->addRow();
-        $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+        $row->addSearchSubmit($session, __('Clear Search'));
 
     echo $form->getOutput();
 

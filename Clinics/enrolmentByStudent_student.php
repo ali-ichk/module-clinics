@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Tables\View\GridView;
@@ -27,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 
     $page->breadcrumbs
         ->add(__m('Enrolment by Student'), 'enrolmentByStudent.php');
@@ -52,11 +55,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
     } else {
         $page->breadcrumbs->add(Format::name('', $person['preferredName'], $person['surname'], 'Student', true, true));
 
-        $returns = array();
-        $returns['error3'] = __m('The selected clinic is full: please select another clinic.');
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, $returns);
-        }
+        $returns = ['error3' => __m('The selected clinic is full: please select another clinic.')];
+        $page->return->addReturns($returns);
 
         //Query blocks in the current year
         $clinicsBlocksGateway = $container->get(ClinicsBlocksGateway::class);
@@ -65,12 +65,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
             ->sortBy(['clinicsBlock.sequenceNumber'])
             ->fromPOST();
 
-        $blocks = $clinicsBlocksGateway->queryBlockEnrolmentByStudent($criteria, $gibbonPersonID, $gibbon->session->get('gibbonSchoolYearID'));
+        $blocks = $clinicsBlocksGateway->queryBlockEnrolmentByStudent($criteria, $gibbonPersonID, $session->get('gibbonSchoolYearID'));
 
         if ($search != '') {
-            echo "<div class='linkTop'>";
-            echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Clinics/enrolmentByStudent.php&search=".$search."'>".__('Back to Search Results').'</a>';
-            echo '</div>';
+            $params = [
+                "search" => $search
+            ];
+            $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Clinics', 'enrolmentByStudent.php')->withQueryParams($params));
         }
 
         // Data Table
@@ -92,12 +93,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
 
         $table->addColumn('clinicName')
             ->setClass('text-lg font-bold mb-1')
-            ->format(function ($block) use ($gibbon, $gibbonPersonID, $search) {
+            ->format(function ($block) use ($gibbonPersonID, $search, $session) {
                 if ($block['clinicName'] != '') {
-                    return $block['clinicName']."<br/><a class='thickbox' href='".$gibbon->session->get('absoluteURL')."/fullscreen.php?q=/modules/Clinics/enrolmentByStudent_student_delete.php&clinicsClinicStudentID=".$block['clinicsClinicStudentID']."&clinicsClinicID=".$block['clinicsClinicID']."&gibbonPersonID=".$block['gibbonPersonID']."&search=".$search."&width=650&height=135'><img src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/garbage.png'/></a>";;
+                    return $block['clinicName']."<br/><a class='thickbox' href='".$session->get('absoluteURL')."/fullscreen.php?q=/modules/Clinics/enrolmentByStudent_student_delete.php&clinicsClinicStudentID=".$block['clinicsClinicStudentID']."&clinicsClinicID=".$block['clinicsClinicID']."&gibbonPersonID=".$block['gibbonPersonID']."&search=".$search."&width=650&height=135'><img src='./themes/".$session->get('gibbonThemeName')."/img/garbage.png'/></a>";;
                 }
                 else {
-                    return "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Clinics/enrolmentByStudent_student_add.php&clinicsBlockID=".$block['clinicsBlockID']."&gibbonPersonID=".$gibbonPersonID."&search=".$search."'><img src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/page_new.png'/></a>";
+                    return "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Clinics/enrolmentByStudent_student_add.php&clinicsBlockID=".$block['clinicsBlockID']."&gibbonPersonID=".$gibbonPersonID."&search=".$search."'><img src='./themes/".$session->get('gibbonThemeName')."/img/page_new.png'/></a>";
                 }
             });
 

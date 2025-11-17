@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,6 +22,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 use Gibbon\Services\Format;
 use Gibbon\Tables\DataTable;
 use Gibbon\Tables\View\GridView;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Clinics\Domain\ClinicsBlocksGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol.php') == false) {
@@ -27,21 +30,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol.php') == fal
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
 
     $page->breadcrumbs
         ->add(__m('Enrol'));
 
-    $enrolmentActive = getSettingByScope($connection2, 'Clinics', 'enrolmentActive');
+    $enrolmentActive = $container->get(SettingGateway::class)->getSettingByScope('Clinics', 'enrolmentActive');
     if ($enrolmentActive != "Y") {
         $page->addMessage(__m('Enrolment is not currently open.'));
     }
     else {
-        $returns = array();
-        $returns['error3'] = __m('The selected clinic is full: please select another clinic.');
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, $returns);
-        }
+        $returns = ['error3' => __m('The selected clinic is full: please select another clinic.')];
+        $page->return->addReturns($returns);
 
         //Query blocks in the current year
         $clinicsBlocksGateway = $container->get(ClinicsBlocksGateway::class);
@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol.php') == fal
             ->sortBy(['clinicsBlock.sequenceNumber'])
             ->fromPOST();
 
-        $blocks = $clinicsBlocksGateway->queryBlockEnrolmentByStudent($criteria, $gibbon->session->get('gibbonPersonID'), $gibbon->session->get('gibbonSchoolYearID'));
+        $blocks = $clinicsBlocksGateway->queryBlockEnrolmentByStudent($criteria, $session->get('gibbonPersonID'), $session->get('gibbonSchoolYearID'));
 
         // Data Table
         $gridRenderer = new GridView($container->get('twig'));
@@ -71,12 +71,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol.php') == fal
 
         $table->addColumn('clinicName')
             ->setClass('text-lg font-bold mb-1')
-            ->format(function ($block) use ($gibbon) {
+            ->format(function ($block) use ($session) {
                 if ($block['clinicName'] != '') {
                     return $block['clinicName'];
                 }
                 else {
-                    return "<a href='".$gibbon->session->get('absoluteURL')."/index.php?q=/modules/Clinics/enrol_add.php&clinicsBlockID=".$block['clinicsBlockID']."'><img src='./themes/".$gibbon->session->get('gibbonThemeName')."/img/page_new.png'/></a>";
+                    return "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Clinics/enrol_add.php&clinicsBlockID=".$block['clinicsBlockID']."'><img src='./themes/".$session->get('gibbonThemeName')."/img/page_new.png'/></a>";
                 }
             });
 

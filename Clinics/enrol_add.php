@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Clinics\Domain\ClinicsGateway;
 
 if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') == false) {
@@ -25,11 +28,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') ==
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
     $clinicsBlockID = $_GET['clinicsBlockID'] ?? '';
 
     try {
-        $dataStudent = array('gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
+        $dataStudent = array('gibbonSchoolYearID' => $gibbonSchoolYearID, 'gibbonPersonID' => $session->get('gibbonPersonID'));
         $sqlStudent = 'SELECT gibbonYearGroupID FROM gibbonStudentEnrolment WHERE gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPersonID=:gibbonPersonID';
         $resultStudent = $connection2->prepare($sqlStudent);
         $resultStudent->execute($dataStudent);
@@ -46,16 +49,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') ==
             ->add(__m('Enrol'), 'enrol.php')
             ->add(__m('Add Clinic'));
 
-        $enrolmentActive = getSettingByScope($connection2, 'Clinics', 'enrolmentActive');
+        $enrolmentActive = $container->get(SettingGateway::class)->getSettingByScope('Clinics', 'enrolmentActive');
         if ($enrolmentActive != "Y") {
             $page->addMessage(__m('Enrolment is not currently open.'));
         }
         else {
-
-            if (isset($_GET['return'])) {
-                returnProcess($guid, $_GET['return'], null, null);
-            }
-
             //Assemble clinic select array
             $clinicsArray = array();
 
@@ -66,16 +64,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') ==
                 ->fromPOST()
                 ->pageSize(0);
 
-            $clinics = $clinicsGateway->queryClinicsBySchoolYear($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonYearGroupID, true);
+            $clinics = $clinicsGateway->queryClinicsBySchoolYear($criteria, $session->get('gibbonSchoolYearID'), $gibbonYearGroupID, true);
 
             foreach ($clinics AS $clinic) {
                 $clinicsArray[$clinic['clinicsBlockID']][$clinic['clinicsClinicID']] = $clinic['name'] ;
             }
 
             //Form
-            $form = Form::create('clinic', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/enrol_addProcess.php');
+            $form = Form::create('clinic', $session->get('absoluteURL').'/modules/'.$session->get('module').'/enrol_addProcess.php');
 
-            $form->addHiddenValue('address', $gibbon->session->get('address'));
+            $form->addHiddenValue('address', $session->get('address'));
             $form->addHiddenValue('clinicsBlockID', $clinicsBlockID);
 
             $row = $form->addRow();

@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
     $page->breadcrumbs
         ->add(__m('Enrolment by Student'), 'enrolmentByStudent.php');
 
-    $gibbonSchoolYearID = $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $session->get('gibbonSchoolYearID');
     $gibbonPersonID = $_GET['gibbonPersonID'] ?? '';
     $search = $_GET['search'] ?? '';
     $clinicsBlockID = $_GET['clinicsBlockID'] ?? '';
@@ -59,10 +61,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
         $page->breadcrumbs
             ->add(__m('Add Clinic'));
 
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null, null);
-        }
-
         //Assemble clinic select array
         $clinicsArray = array();
 
@@ -73,7 +71,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
             ->fromPOST()
             ->pageSize(0);
 
-        $clinics = $clinicsGateway->queryClinicsBySchoolYear($criteria, $gibbon->session->get('gibbonSchoolYearID'), $gibbonYearGroupID);
+        $clinics = $clinicsGateway->queryClinicsBySchoolYear($criteria, $session->get('gibbonSchoolYearID'), $gibbonYearGroupID);
 
         foreach ($clinics AS $clinic) {
             $clinicsArray[$clinic['clinicsBlockID']][$clinic['clinicsClinicID']] = $clinic['name'] ;
@@ -83,9 +81,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
         }
 
         //Form
-        $form = Form::create('clinic', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/enrolmentByStudent_student_addProcess.php');
+        $form = Form::create('clinic', $session->get('absoluteURL').'/modules/'.$session->get('module').'/enrolmentByStudent_student_addProcess.php');
 
-        $form->addHiddenValue('address', $gibbon->session->get('address'));
+        $form->addHiddenValue('address', $session->get('address'));
         $form->addHiddenValue('clinicsBlockID', $clinicsBlockID);
         $form->addHiddenValue('gibbonPersonID', $gibbonPersonID);
         $form->addHiddenValue('search', $search);

@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -46,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
     echo '</h2>';
 
     $form = Form::create('searchForm', $session->get('absoluteURL').'/index.php', 'get');
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
 
     $form->addHiddenValue('q', '/modules/'.$session->get('module').'/enrolmentByStudent.php');
 
@@ -55,7 +57,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrolmentByStudent
         $row->addTextField('search')->setValue($criteria->getSearchText());
 
     $row = $form->addRow();
-        $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+        $row->addSearchSubmit($session, __('Clear Search'));
 
     echo $form->getOutput();
 

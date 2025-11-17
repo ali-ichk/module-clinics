@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,37 +29,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinicsBlocks_mana
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
 
     $page->breadcrumbs
         ->add(__m('Manage Blocks'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     // School Year Picker
     if (!empty($gibbonSchoolYearID)) {
-        $schoolYearGateway = $container->get(SchoolYearGateway::class);
-        $yearName = $schoolYearGateway->getSchoolYearByID($gibbonSchoolYearID);
-
-        echo '<h2>';
-        echo $yearName['name'];
-        echo '</h2>';
-
-        echo "<div class='linkTop'>";
-            if ($prevSchoolYear = $schoolYearGateway->getPreviousSchoolYearByID($gibbonSchoolYearID)) {
-                echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q='.$_GET['q'].'&gibbonSchoolYearID='.$prevSchoolYear['gibbonSchoolYearID']."'>".__('Previous Year').'</a> ';
-            } else {
-                echo __('Previous Year').' ';
-            }
-			echo ' | ';
-			if ($nextSchoolYear = $schoolYearGateway->getNextSchoolYearByID($gibbonSchoolYearID)) {
-				echo "<a href='".$gibbon->session->get('absoluteURL').'/index.php?q='.$_GET['q'].'&gibbonSchoolYearID='.$nextSchoolYear['gibbonSchoolYearID']."'>".__('Next Year').'</a> ';
-			} else {
-				echo __('Next Year').' ';
-			}
-        echo '</div>';
+        $page->navigator->addSchoolYearNavigation($gibbonSchoolYearID);
     }
 
     //Query blocks

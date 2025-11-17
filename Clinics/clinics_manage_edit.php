@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Http\Url;
 use Gibbon\Forms\Form;
 use Gibbon\Forms\DatabaseFormFactory;
 use Gibbon\Domain\School\SchoolYearGateway;
@@ -27,7 +30,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_edi
     $page->addError(__('You do not have access to this action.'));
 } else {
     // Proceed!
-    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $gibbon->session->get('gibbonSchoolYearID');
+    $gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
     $schoolYearGateway = $container->get(SchoolYearGateway::class);
     $schoolYear = $schoolYearGateway->getSchoolYearByID($gibbonSchoolYearID);
     $clinicsBlockID = $_GET['clinicsBlockID'] ?? '';
@@ -38,14 +41,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_edi
         ->add(__m('Manage Clinics'), 'clinics_manage.php', ['gibbonSchoolYearID' => $gibbonSchoolYearID])
         ->add(__m('Edit Clinic'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     if ($clinicsBlockID != '') {
-        echo "<div class='linkTop'>";
-        echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Clinics/clinics_manage.php&gibbonSchoolYearID=".$gibbonSchoolYearID."&clinicsBlockID=".$clinicsBlockID."'>".('Back to Search Results')."</a>";
-        echo "</div>";
+        $params = [
+            "gibbonSchoolYearID" => $gibbonSchoolYearID,
+            "clinicsBlockID" => $clinicsBlockID
+        ];
+        $page->navigator->addSearchResultsAction(Url::fromModuleRoute('Clinics', 'clinics_manage.php')->withQueryParams($params));
     }
 
     if (empty($clinicsClinicID)) {
@@ -60,10 +61,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_edi
         return;
     }
 
-    $form = Form::create('clinic', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/clinics_manage_editProcess.php?clinicsBlockID='.$clinicsBlockID);
+    $form = Form::create('clinic', $session->get('absoluteURL').'/modules/'.$session->get('module').'/clinics_manage_editProcess.php?clinicsBlockID='.$clinicsBlockID);
     $form->setFactory(DatabaseFormFactory::create($pdo));
 
-    $form->addHiddenValue('address', $gibbon->session->get('address'));
+    $form->addHiddenValue('address', $session->get('address'));
     $form->addHiddenValue('gibbonSchoolYearID', $gibbonSchoolYearID);
     $form->addHiddenValue('clinicsClinicID', $clinicsClinicID);
 

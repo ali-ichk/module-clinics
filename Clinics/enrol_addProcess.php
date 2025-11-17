@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,19 +19,20 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Domain\System\SettingGateway;
 use Gibbon\Module\Clinics\Domain\ClinicsGateway;
 use Gibbon\Module\Clinics\Domain\ClinicsStudentsGateway;
 
 require_once '../../gibbon.php';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Clinics/enrol.php';
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Clinics/enrol.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') == false) {
     $URL .= '&return=error0';
     header("Location: {$URL}");
     exit;
 } else {
-    $enrolmentActive = getSettingByScope($connection2, 'Clinics', 'enrolmentActive');
+    $enrolmentActive = $container->get(SettingGateway::class)->getSettingByScope('Clinics', 'enrolmentActive');
     if ($enrolmentActive != "Y") {
         $URL .= '&return=error0';
         header("Location: {$URL}");
@@ -42,7 +45,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') ==
 
         $data = [
             'clinicsBlockID'        => $_POST['clinicsBlockID'] ?? '',
-            'gibbonPersonID'        => $gibbon->session->get('gibbonPersonID') ?? '',
+            'gibbonPersonID'        => $session->get('gibbonPersonID') ?? '',
             'clinicsClinicID'       => $_POST['clinicsClinicID'] ?? '',
             'status'                => 'Enroled'
         ];
@@ -89,7 +92,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/enrol_add.php') ==
                 $enroled = false;
                 //Check for existing enrolment in this clinic
                 foreach ($enrolments AS $enrolment) {
-                    if ($enrolment['gibbonPersonID'] == $gibbon->session->get('gibbonPersonID')) {
+                    if ($enrolment['gibbonPersonID'] == $session->get('gibbonPersonID')) {
                         $enroled = true;
                     }
                 }

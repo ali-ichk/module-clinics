@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,10 +39,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
         //Proceed!
         $page->breadcrumbs->add(__('Identify Priorities'));
 
-        if (isset($_GET['return'])) {
-            returnProcess($guid, $_GET['return'], null);
-        }
-
         echo '<h2>';
         echo __('Filter');
         echo '</h2>';
@@ -48,11 +46,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
         $gibbonYearGroupID = $_GET['gibbonYearGroupID'] ?? '';
         $gibbonDepartmentID = $_GET['gibbonDepartmentID'] ?? '';
 
-        $form = Form::create('filter', $gibbon->session->get('absoluteURL').'/index.php', 'get');
+        $form = Form::create('filter', $session->get('absoluteURL').'/index.php', 'get');
         $form->setFactory(DatabaseFormFactory::create($pdo));
-        $form->setClass('noIntBorder fullWidth');
+        $form->setClass('noIntBorder w-full');
 
-        $form->addHiddenValue('q', '/modules/'.$gibbon->session->get('module').'/identify.php');
+        $form->addHiddenValue('q', '/modules/'.$session->get('module').'/identify.php');
 
         $row = $form->addRow();
             $row->addLabel('gibbonYearGroupID', __('Year Group'));
@@ -65,7 +63,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
                 $sqlDepartments = "SELECT gibbonDepartmentID as value, name, nameShort FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
             }
             else {
-                $dataDepartments = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'));
+                $dataDepartments = array('gibbonPersonID' => $session->get('gibbonPersonID'));
                 $sqlDepartments = "SELECT gibbonDepartment.gibbonDepartmentID as value, name, nameShort
                         FROM gibbonDepartment
                             JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
@@ -80,7 +78,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
         }
 
         $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+            $row->addSearchSubmit($session, __('Clear Filters'));
 
         echo $form->getOutput();
 
@@ -100,7 +98,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
             $departmentalAccess = true;
             if ($highestAction != "Identify Priorities_all") {
                 try {
-                    $dataDepartments = array('gibbonPersonID' => $gibbon->session->get('gibbonPersonID'), 'gibbonDepartmentID' => $gibbonDepartmentID);
+                    $dataDepartments = array('gibbonPersonID' => $session->get('gibbonPersonID'), 'gibbonDepartmentID' => $gibbonDepartmentID);
                     $sqlDepartments = "SELECT gibbonDepartment.gibbonDepartmentID as value, name, nameShort
                             FROM gibbonDepartment
                                 JOIN gibbonDepartmentStaff ON (gibbonDepartmentStaff.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID)
@@ -125,18 +123,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
                 echo __('You do not have access to this action.');
                 echo '</div>';
             } else {
-                $form = Form::create('identify', $gibbon->session->get('absoluteURL').'/modules/'.$gibbon->session->get('module').'/identifyProcess.php');
+                $form = Form::createBlank('identify', $session->get('absoluteURL').'/modules/'.$session->get('module').'/identifyProcess.php');
                 $form->setTitle('Priorities');
-                $form->setClass('w-full blank');
-                $form->addHiddenValue('address', $gibbon->session->get('address'));
+                $form->addHiddenValue('address', $session->get('address'));
                 $form->addHiddenValue('gibbonYearGroupID', $gibbonYearGroupID);
                 $form->addHiddenValue('gibbonDepartmentID', $gibbonDepartmentID);
 
-                $table = $form->addRow()->addTable()->setClass('mini fullWidth');
+                $table = $form->addRow()->addTable()->setClass('mini w-full');
 
                 //Fetch students
                 try {
-                    $dataStudents = array('gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'), 'gibbonYearGroupID' => $gibbonYearGroupID, 'today' => date('Y-m-d'));
+                    $dataStudents = array('gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'), 'gibbonYearGroupID' => $gibbonYearGroupID, 'today' => date('Y-m-d'));
                     $sqlStudents = "SELECT gibbonPerson.gibbonPersonID, gibbonStudentEnrolmentID, gibbonStudentEnrolment.gibbonSchoolYearID, gibbonPerson.title, gibbonPerson.preferredName, gibbonPerson.surname
                         FROM gibbonPerson
                             INNER JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID)
@@ -157,7 +154,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Clinics/identify.php') == 
                 //Fetch priorities
                 $priorities = array() ;
                 try {
-                    $dataPriorities = array('gibbonYearGroupID' => $gibbonYearGroupID, 'gibbonSchoolYearID' => $gibbon->session->get('gibbonSchoolYearID'));
+                    $dataPriorities = array('gibbonYearGroupID' => $gibbonYearGroupID, 'gibbonSchoolYearID' => $session->get('gibbonSchoolYearID'));
                     $sqlPriorities = 'SELECT *
                         FROM clinicsPriority
                             INNER JOIN gibbonStudentEnrolment ON (gibbonStudentEnrolment.gibbonPersonID=clinicsPriority.gibbonPersonID)

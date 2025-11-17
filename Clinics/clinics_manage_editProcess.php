@@ -1,7 +1,9 @@
 <?php
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+Gibbon: the flexible, open school platform
+Founded by Ross Parker at ICHK Secondary. Built by Ross Parker, Sandra Kuipers and the Gibbon community (https://gibbonedu.org/about/)
+Copyright © 2010, Gibbon Foundation
+Gibbon™, Gibbon Education Ltd. (Hong Kong)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,11 +24,11 @@ use Gibbon\Module\Clinics\Domain\ClinicsGateway;
 
 require_once '../../gibbon.php';
 
-$gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $gibbon->session->get('gibbonSchoolYearID');
+$gibbonSchoolYearID = $_REQUEST['gibbonSchoolYearID'] ?? $session->get('gibbonSchoolYearID');
 $clinicsBlockID = $_GET['clinicsBlockID'] ?? '';
 $clinicsClinicID = $_POST['clinicsClinicID'] ?? '';
 
-$URL = $gibbon->session->get('absoluteURL').'/index.php?q=/modules/Clinics/clinics_manage_edit.php&gibbonSchoolYearID='.$gibbonSchoolYearID.'&clinicsClinicID='.$clinicsClinicID.'&clinicsBlockID='.$clinicsBlockID;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/Clinics/clinics_manage_edit.php&gibbonSchoolYearID='.$gibbonSchoolYearID.'&clinicsClinicID='.$clinicsClinicID.'&clinicsBlockID='.$clinicsBlockID;
 
 if (isActionAccessible($guid, $connection2, '/modules/Clinics/clinics_manage_edit.php') == false) {
     $URL .= '&return=error0';

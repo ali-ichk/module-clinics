@@ -1,5 +1,41 @@
 CHANGELOG
 =========
+v1.11.01
+-------
+Replaced deprecated $gibbon->session calls with $session
+
+v1.11.00
+-------
+Gibbon v28 Compatibility
+
+v1.10.02
+-------
+Fixed JS bug introduced in ownership transfer
+
+v1.10.01
+-------
+Fixed CSS bug introduced in last version
+
+v1.10.00
+-------
+Transferred ownership from Ross Parker to Gibbon Foundation
+
+v1.9.01
+-------
+Refactoring of linkTop divs
+
+v1.9.00
+-------
+Implemented new v23 year selector
+
+v1.8.02
+-------
+Removed deprecated function calls
+
+v1.8.01
+-------
+Finished session refactoring
+
 v1.8.00
 -------
 Change Roll Groups to Form Groups, requires v22.0.00
